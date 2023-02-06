@@ -39,24 +39,6 @@ def show_category(request, category_name_slug):
     return render(request, 'rango/category.html', context=context_dict)
 
 
-def show_page(request, page_name_slug):
-    context_dict = {}
-
-    try:
-        page = Category.objects.get(slug=page_name_slug)
-        categories = Category.objects.filter(Page=page)
-
-        context_dict['pages'] = page
-        context_dict['category'] = categories
-
-
-    except Page.DoesNotExist:
-        context_dict['category'] = None
-        context_dict['pages'] = None
-
-    return render(request, 'rango/page.html', context=context_dict)
-
-
 def add_category(request):
     form = CategoryForm()
 
