@@ -1,11 +1,13 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.urls import reverse
+
 from rango.models import Category
 from rango.models import Page
 from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
-from django.shortcuts import redirect
 
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponse
+from django.urls import reverse
+from django.shortcuts import redirect
 
 def index(request):
     category_list = Category.objects.order_by('-likes')[:5]
@@ -114,3 +116,28 @@ def register(request):
     return render(request, 'rango/register.html', context={'user_form': user_form,
                                                            'profile_form': profile_form,
                                                            'registered': registered})
+
+
+def user_login(request):
+    if request.method == 'POST':
+
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(username=username, password=password)
+
+        if user:
+
+            if user.is_active:
+                login(request, user)
+                return redirect(reverse('rango:index'))
+            else:
+
+                return HttpResponse("Your Rango account is disabled.")
+        else:
+
+            print(f"Invalid login details: {username}, {password}")
+            return HttpResponse("Invalid login details supplied.")
+    else:
+
+        return render(request, 'rango/login.html')
